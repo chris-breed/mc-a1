@@ -68,13 +68,12 @@
             tools:layout_editor_absoluteX="8dp"
             tools:layout_editor_absoluteY="365dp" />
 
-        <EditText
+        <TextView
             android:id="@+id/edit_bottom"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:ems="10"
-            android:inputType="number"
             tools:layout_editor_absoluteX="84dp"
             tools:layout_editor_absoluteY="448dp" />
 

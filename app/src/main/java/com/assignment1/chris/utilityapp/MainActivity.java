@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -16,13 +17,16 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.MalformedURLException;
 
 public class MainActivity extends AppCompatActivity {
 
-    String result = "";
-
     String url = "https://free.currencyconverterapi.com/api/v5/convert?q=";
+
+    double conversion;
 
     public MainActivity() throws MalformedURLException {
     }
@@ -35,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         final EditText editTop = findViewById(R.id.edit_top);
-        final EditText editBottom = findViewById(R.id.edit_bottom);
+        final TextView editBottom = findViewById(R.id.edit_bottom);
 
         final Spinner spinnerTop = findViewById(R.id.spinner_top);
         final Spinner spinnerBottom = findViewById(R.id.spinner_bottom);
@@ -64,11 +68,11 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Send request for conversion
 
-                String from;
-                String to;
+                final String from;
+                final String to;
                 from = spinnerTop.getSelectedItem().toString().split(",")[0];
                 to = spinnerBottom.getSelectedItem().toString().split(",")[0];
-                Log.i("Volley", from);
+                Log.i("Volley", "Converting from: " + from + " to " + to + ".");
 
                 final String newUrl = url + from + "_" + to;
 
@@ -77,9 +81,22 @@ public class MainActivity extends AppCompatActivity {
                 StringRequest stringRequest = new StringRequest(Request.Method.GET, newUrl, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.i("Volley", "onResponse() called, " + newUrl);
+//                        Log.i("Volley", "onResponse() called, " + newUrl);
                         Log.i("Volley", response);
-                        result = response;
+
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            conversion = json.getJSONObject("results").getJSONObject((from + "_" + to).toUpperCase()).getDouble("val");
+                            Log.i("Volley", conversion + "");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        float originalValue = Float.parseFloat(editTop.getText().toString());
+                        double newValue = originalValue * conversion;
+
+                        editBottom.setText(String.format("%s", newValue));
+
                     }
                 }, new Response.ErrorListener() {
                     @Override
@@ -90,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
 
                 queue.add(stringRequest);
 
-                Log.i("Volley", result);
             }
         });
 
