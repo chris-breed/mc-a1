@@ -1,6 +1,7 @@
 package com.assignment1.chris.utilityapp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -25,18 +26,19 @@ import java.net.MalformedURLException;
 
 public class MainActivity extends AppCompatActivity {
 
-    String url = "https://free.currencyconverterapi.com/api/v5/convert?q=";
-
     double conversion;
+
+    public SharedPreferences preferences;
 
     public MainActivity() throws MalformedURLException {
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        final String url = "https://free.currencyconverterapi.com/api/v5/convert?q=";
 
 
         final EditText editTop = findViewById(R.id.edit_top);
@@ -45,11 +47,25 @@ public class MainActivity extends AppCompatActivity {
         final Spinner spinnerTop = findViewById(R.id.spinner_top);
         final Spinner spinnerBottom = findViewById(R.id.spinner_bottom);
 
+
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.currencies, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTop.setAdapter(adapter);
         spinnerBottom.setAdapter(adapter);
+
+
+        // Check preferences and set what needs to be set
+
+        // Top spinner and default value
+        String defaultCurrency = null;
+        try {
+            defaultCurrency = preferences.getString("defaultCurrency", "DEFAULT");
+            int spinnerPosition = adapter.getPosition(defaultCurrency);
+            spinnerTop.setSelection(spinnerPosition);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Button swap = findViewById(R.id.btn_swap);
         swap.setOnClickListener(new View.OnClickListener() {
