@@ -1,5 +1,6 @@
 package com.assignment1.chris.utilityapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                         float originalValue = Float.parseFloat(editTop.getText().toString());
                         double newValue = originalValue * conversion;
 
-                        editBottom.setText(String.format("%s", newValue));
+                        editBottom.setText(cleanUpValue(newValue));
 
                     }
                 }, new Response.ErrorListener() {
@@ -108,8 +109,22 @@ public class MainActivity extends AppCompatActivity {
                 queue.add(stringRequest);
 
             }
+
+            private String cleanUpValue(double val) {
+                float decimalRemoved = Float.parseFloat(String.format("%.2f", val));
+
+                return String.format("$%s", decimalRemoved);
+            }
         });
 
+        Button settings = findViewById(R.id.btn_config);
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
 

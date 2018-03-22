@@ -2,6 +2,7 @@
     <string name="app_name">UtilityApp</string>
     <string name="btn_swap">Swap Values</string>
     <string name="btn_convert">Convert</string>
+    <string name="btn_config">Settings</string>
     <string name="txt_to">To</string>
 
     <string-array name="currencies">
