@@ -1,8 +1,8 @@
 package com.assignment1.chris.utilityapp;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -23,12 +23,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;
+import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity /*implements GestureDetector.OnGestureListener */ {
 
     double conversion;
-
-    public SharedPreferences preferences;
 
     public MainActivity() throws MalformedURLException {
     }
@@ -40,13 +39,13 @@ public class MainActivity extends AppCompatActivity {
 
         final String url = "https://free.currencyconverterapi.com/api/v5/convert?q=";
 
+        String defaultCurrency = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("defaultCurrency", "falseValue");
 
         final EditText editTop = findViewById(R.id.edit_top);
         final TextView editBottom = findViewById(R.id.edit_bottom);
 
         final Spinner spinnerTop = findViewById(R.id.spinner_top);
         final Spinner spinnerBottom = findViewById(R.id.spinner_bottom);
-
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.currencies, android.R.layout.simple_spinner_item);
@@ -58,24 +57,34 @@ public class MainActivity extends AppCompatActivity {
         // Check preferences and set what needs to be set
 
         // Top spinner and default value
-        String defaultCurrency = null;
-        try {
-            defaultCurrency = preferences.getString("defaultCurrency", "DEFAULT");
+        if (!defaultCurrency.equals("falseValue")) {
             int spinnerPosition = adapter.getPosition(defaultCurrency);
             spinnerTop.setSelection(spinnerPosition);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
+        // Buttons and their listeners
         Button swap = findViewById(R.id.btn_swap);
         swap.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-                int tempTop = Integer.parseInt(editTop.getText().toString());
-                int tempBottom = Integer.parseInt(editBottom.getText().toString());
+                float tempTop;
 
-                editTop.setText("" + tempBottom);
-                editBottom.setText("" + tempTop);
+                try {
+                    tempTop = Float.parseFloat(editTop.getText().toString());
+                } catch (NumberFormatException e) {
+                    tempTop = 0;
+                }
+
+                float tempBottom;
+                try {
+                    tempBottom = Float.parseFloat(editBottom.getText().toString().replace("$", ""));
+                } catch (NumberFormatException e) {
+                    tempBottom = 0;
+                }
+
+                editTop.setText(String.format("%s", tempBottom));
+                editBottom.setText(String.format("%s", tempTop));
             }
         });
 
@@ -85,13 +94,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Send request for conversion
 
+                editBottom.setText(R.string.txt_converting);
+
                 final String from;
                 final String to;
                 from = spinnerTop.getSelectedItem().toString().split(",")[0];
                 to = spinnerBottom.getSelectedItem().toString().split(",")[0];
                 Log.i("Volley", "Converting from: " + from + " to " + to + ".");
 
-                final String newUrl = url + from + "_" + to;
+                String newUrl = calculateURL(url, from, to);
 
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
@@ -102,33 +113,50 @@ public class MainActivity extends AppCompatActivity {
                         Log.i("Volley", response);
 
                         try {
-                            JSONObject json = new JSONObject(response);
-                            conversion = json.getJSONObject("results").getJSONObject((from + "_" + to).toUpperCase()).getDouble("val");
-                            Log.i("Volley", conversion + "");
+                            conversion = getConversion(to, from, response);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
 
-                        float originalValue = Float.parseFloat(editTop.getText().toString());
-                        double newValue = originalValue * conversion;
+                        double convertedValue = convertValue(conversion);
 
-                        editBottom.setText(cleanUpValue(newValue));
+                        editBottom.setText(readyValueForStringInsertion(convertedValue));
 
                     }
+
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.i("Volley", "onErrorResponse() called");
                     }
                 });
-
                 queue.add(stringRequest);
-
             }
 
-            private String cleanUpValue(double val) {
-                float decimalRemoved = Float.parseFloat(String.format("%.2f", val));
+            private String calculateURL(String url, String from, String to) {
+                return (url + from + "_" + to).toUpperCase();
+            }
 
+
+            private double getConversion(String to, String from, String response) throws JSONException {
+                JSONObject json = new JSONObject(response);
+                try {
+                    conversion = json.getJSONObject("results").getJSONObject((from + "_" + to).toUpperCase()).getDouble("val");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.i("Volley", conversion + "");
+
+                return conversion;
+            }
+
+            private double convertValue(double conversion) { // Converts the value of the editText to be equal to conversion * value
+                float originalValue = Float.parseFloat(editTop.getText().toString());
+                return originalValue * conversion;
+            }
+
+            private String readyValueForStringInsertion(double val) { // Readies the value to be inserted into TextView
+                float decimalRemoved = Float.parseFloat(String.format(Locale.ENGLISH, "%.2f", val));
                 return String.format("$%s", decimalRemoved);
             }
         });
@@ -141,9 +169,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
     }
-
-
 }
 

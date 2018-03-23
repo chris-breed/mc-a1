@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -32,7 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                preferences.edit().putString("defaultCurrency", spinnerDefault.getSelectedItem().toString()).apply();
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("defaultCurrency", spinnerDefault.getSelectedItem().toString()).apply();
 
                 Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
                 startActivity(intent);
