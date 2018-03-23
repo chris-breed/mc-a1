@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName|number"
-            android:labelFor="@+id/textView"
+            android:labelFor="@id/edit_top"
             tools:layout_editor_absoluteX="84dp"
             tools:layout_editor_absoluteY="16dp" />
 
