@@ -4,9 +4,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by Chris on 23/03/2018.
- */
 public class MainActivityTest {
     @Test
     public void generateURL() throws Exception {

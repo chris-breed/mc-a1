@@ -27,22 +27,31 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity /*implements GestureDetector.OnGestureListener */ {
 
     double conversion;
+    EditText editTop;
+    TextView editBottom;
+    Spinner spinnerTop;
+    Spinner spinnerBottom;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String defaultCurrency = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("defaultCurrency", "falseValue");
+        String defaultCurrency = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                .getString("defaultCurrency", "falseValue");
+        String previousAmount = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                .getString("previousAmount", "falseValue");
 
         final String url = "https://free.currencyconverterapi.com/api/v5/convert?q=";
 
         // Conversion Texts
-        final EditText editTop = findViewById(R.id.edit_top);
-        final TextView editBottom = findViewById(R.id.edit_bottom);
+        editTop = findViewById(R.id.edit_top);
+        editBottom = findViewById(R.id.edit_bottom);
         // Currency Spinners
-        final Spinner spinnerTop = findViewById(R.id.spinner_top);
-        final Spinner spinnerBottom = findViewById(R.id.spinner_bottom);
+        spinnerTop = findViewById(R.id.spinner_top);
+        spinnerBottom = findViewById(R.id.spinner_bottom);
 
         // Initialises the Spinners with the currencies, from string array
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -55,6 +64,11 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
         if (!defaultCurrency.equals("falseValue")) {
             int spinnerPosition = adapter.getPosition(defaultCurrency);
             spinnerTop.setSelection(spinnerPosition);
+        }
+
+        // Top editText value, From previous instance of app
+        if (!previousAmount.equals("falseValue")) {
+            editTop.setText(previousAmount);
         }
 
         // Buttons and their listeners
@@ -72,7 +86,8 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
 
                 float tempBottom;
                 try {
-                    tempBottom = Float.parseFloat(editBottom.getText().toString().replace("$", ""));
+                    tempBottom = Float.parseFloat(editBottom.getText().toString()
+                            .replace("$", ""));
                 } catch (NumberFormatException e) {
                     tempBottom = 0;
                 }
@@ -98,7 +113,8 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
 
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, newUrl, new Response.Listener<String>() {
+                StringRequest stringRequest = new StringRequest(
+                        Request.Method.GET, newUrl, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
 //                        Log.i("Volley", response);
@@ -123,11 +139,11 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
             }
 
 
-
             private double getConversion(String to, String from, String response) throws JSONException {
                 JSONObject json = new JSONObject(response);
                 try {
-                    conversion = json.getJSONObject("results").getJSONObject((from + "_" + to).toUpperCase()).getDouble("val");
+                    conversion = json.getJSONObject("results").getJSONObject((from + "_" + to)
+                            .toUpperCase()).getDouble("val");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -136,7 +152,12 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
                 return conversion;
             }
 
-            private double convertValue(double conversion) { // Converts the value of the editText to be equal to conversion * value
+            private String generateURL(String url, String from, String to) {
+                return (url + from.toUpperCase() + "_" + to.toUpperCase());
+            }
+
+            private double convertValue(double conversion) {
+                // Converts the value of the editText to be equal to conversion * value
                 float originalValue = Float.parseFloat(editTop.getText().toString());
                 return originalValue * conversion;
             }
@@ -157,7 +178,12 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
         });
     }
 
-    private String generateURL(String url, String from, String to) {
-        return (url + from.toUpperCase() + "_" + to.toUpperCase());
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Saves double value in editTop when the application is destroyed.
+        PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
+                .putString("previousAmount", editTop.getText().toString()).apply();
     }
 }
