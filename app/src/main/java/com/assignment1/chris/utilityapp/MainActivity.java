@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
         // Buttons and their listeners
         Button swap = findViewById(R.id.btn_swap);
         swap.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 float tempTop;
@@ -102,7 +101,7 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
                 to = spinnerBottom.getSelectedItem().toString().split(",")[0];
                 Log.i("Volley", "Converting from: " + from + " to " + to + ".");
 
-                String newUrl = calculateURL(url, from, to);
+                String newUrl = generateURL(url, from, to);
 
                 RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
@@ -120,10 +119,8 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
 
                         double convertedValue = convertValue(conversion);
 
-                        editBottom.setText(readyValueForStringInsertion(convertedValue));
-
+                        editBottom.setText(correctStringForEditText(convertedValue));
                     }
-
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
@@ -133,10 +130,9 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
                 queue.add(stringRequest);
             }
 
-            private String calculateURL(String url, String from, String to) {
-                return (url + from + "_" + to).toUpperCase();
+            private String generateURL(String url, String from, String to) {
+                return (url + from.toUpperCase() + "_" + to.toUpperCase());
             }
-
 
             private double getConversion(String to, String from, String response) throws JSONException {
                 JSONObject json = new JSONObject(response);
@@ -155,7 +151,7 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
                 return originalValue * conversion;
             }
 
-            private String readyValueForStringInsertion(double val) { // Readies the value to be inserted into TextView
+            private String correctStringForEditText(double val) { // Readies the value to be inserted into TextView
                 float decimalRemoved = Float.parseFloat(String.format(Locale.ENGLISH, "%.2f", val));
                 return String.format("$%s", decimalRemoved);
             }
