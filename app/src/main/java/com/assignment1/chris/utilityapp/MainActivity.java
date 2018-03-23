@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
     Spinner spinnerTop;
     Spinner spinnerBottom;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -132,7 +131,7 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.i("Volley", "onErrorResponse() called");
+//                        Log.i("Volley", "onErrorResponse() called");
                     }
                 });
                 queue.add(stringRequest);
@@ -147,7 +146,7 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.i("Volley", conversion + "");
+//                Log.i("Volley", conversion + "");
 
                 return conversion;
             }
@@ -179,11 +178,12 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
 
-        // Saves double value in editTop when the application is destroyed.
+        // Saves current number in edittext for the next session
         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
                 .putString("previousAmount", editTop.getText().toString()).apply();
+
     }
 }
