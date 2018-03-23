@@ -1,12 +1,13 @@
 package com.assignment1.chris.utilityapp;
 
-import org.junit.Assert;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.*;
 
-public class UtilityAppUnitTest {
+/**
+ * Created by Chris on 23/03/2018.
+ */
+public class MainActivityTest {
     @Test
     public void generateURL() throws Exception {
         String from = "usd";
@@ -27,4 +28,5 @@ public class UtilityAppUnitTest {
 
         assertEquals(85.05, convertedValued, delta);
     }
+
 }
