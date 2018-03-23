@@ -57,6 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:onClick="convertButtonPress"
                 android:text="@string/btn_swap"
                 tools:layout_editor_absoluteX="197dp"
                 tools:layout_editor_absoluteY="222dp" />
@@ -82,7 +83,8 @@
             android:id="@+id/btn_convert"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/btn_convert" />
+            android:text="@string/btn_convert"
+            android:onClick="convertButtonPress" />/>
 
     </LinearLayout>
 
