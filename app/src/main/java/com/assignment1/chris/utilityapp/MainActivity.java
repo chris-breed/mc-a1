@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
         detector = new GestureDetectorCompat(this, this);
 
+        // shared preferences
         String defaultCurrency = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
                 .getString("defaultCurrency", "falseValue");
         String previousAmount = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         btn_swap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // swaps the editext and edittext bottom values with each other
                 float tempTop;
 
                 try {
