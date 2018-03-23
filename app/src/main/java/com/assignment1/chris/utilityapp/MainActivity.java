@@ -22,49 +22,44 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.MalformedURLException;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity /*implements GestureDetector.OnGestureListener */ {
 
     double conversion;
 
-    public MainActivity() throws MalformedURLException {
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final String url = "https://free.currencyconverterapi.com/api/v5/convert?q=";
-
         String defaultCurrency = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("defaultCurrency", "falseValue");
 
+        final String url = "https://free.currencyconverterapi.com/api/v5/convert?q=";
+
+        // Conversion Texts
         final EditText editTop = findViewById(R.id.edit_top);
         final TextView editBottom = findViewById(R.id.edit_bottom);
-
+        // Currency Spinners
         final Spinner spinnerTop = findViewById(R.id.spinner_top);
         final Spinner spinnerBottom = findViewById(R.id.spinner_bottom);
 
+        // Initialises the Spinners with the currencies, from string array
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.currencies, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTop.setAdapter(adapter);
         spinnerBottom.setAdapter(adapter);
 
-
-        // Check preferences and set what needs to be set
-
-        // Top spinner and default value
+        // Top spinner default value
         if (!defaultCurrency.equals("falseValue")) {
             int spinnerPosition = adapter.getPosition(defaultCurrency);
             spinnerTop.setSelection(spinnerPosition);
         }
 
         // Buttons and their listeners
-        Button swap = findViewById(R.id.btn_swap);
-        swap.setOnClickListener(new View.OnClickListener() {
+        Button btn_swap = findViewById(R.id.btn_swap);
+        btn_swap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 float tempTop;
@@ -95,11 +90,9 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
 
                 editBottom.setText(R.string.txt_converting);
 
-                final String from;
-                final String to;
-                from = spinnerTop.getSelectedItem().toString().split(",")[0];
-                to = spinnerBottom.getSelectedItem().toString().split(",")[0];
-                Log.i("Volley", "Converting from: " + from + " to " + to + ".");
+                final String to = spinnerBottom.getSelectedItem().toString().split(",")[0];
+                final String from = spinnerTop.getSelectedItem().toString().split(",")[0];
+//                Log.i("Volley", "Converting from: " + from + " to " + to + ".");
 
                 String newUrl = generateURL(url, from, to);
 
@@ -108,8 +101,7 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
                 StringRequest stringRequest = new StringRequest(Request.Method.GET, newUrl, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-//                        Log.i("Volley", "onResponse() called, " + newUrl);
-                        Log.i("Volley", response);
+//                        Log.i("Volley", response);
 
                         try {
                             conversion = getConversion(to, from, response);
@@ -130,9 +122,7 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
                 queue.add(stringRequest);
             }
 
-            private String generateURL(String url, String from, String to) {
-                return (url + from.toUpperCase() + "_" + to.toUpperCase());
-            }
+
 
             private double getConversion(String to, String from, String response) throws JSONException {
                 JSONObject json = new JSONObject(response);
@@ -166,5 +156,8 @@ public class MainActivity extends AppCompatActivity /*implements GestureDetector
             }
         });
     }
-}
 
+    private String generateURL(String url, String from, String to) {
+        return (url + from.toUpperCase() + "_" + to.toUpperCase());
+    }
+}
