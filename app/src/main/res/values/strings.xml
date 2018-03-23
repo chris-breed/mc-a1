@@ -6,7 +6,7 @@
     <string name="txt_to">To</string>
     <string name="defaultCurrency">Select your default currency:</string>
     <string name="btn_save">Save and Back</string>
-    <string name="txt_converting">Converting...</string>
+    <string name="txt_converting">Converting…</string>
 
     <string-array name="currencies">
         <item>AED, United Arab Emirates Dirham</item>
